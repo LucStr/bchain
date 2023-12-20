@@ -9,20 +9,19 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
 contract ProductNFT is ERC721, ERC721Burnable, Ownable {
-    struct Prpduct {
+    struct Product {
         string brand;
-        string model;
         string serialNumber;
-        string TransferLogs;
+        string transferLogs;
     }
-
+/**
     struct Transfer {
         address station;
         string name;
     }
 
     Transfer[] public TransferHistory;
-
+*/
     mapping(uint256 => Product) public products;
 
     IERC20 public tokenContract;
@@ -50,7 +49,9 @@ contract ProductNFT is ERC721, ERC721Burnable, Ownable {
         _;
     }
 
-    constructor(address _tokenContractAddress) ERC721("Product", "WTK") {
+    constructor(address _tokenContractAddress) 
+        ERC721("Product", "WTK")
+        Ownable(msg.sender) {
         tokenContract = IERC20(_tokenContractAddress);
     }
 
@@ -58,11 +59,11 @@ contract ProductNFT is ERC721, ERC721Burnable, Ownable {
         string memory brand,
         string memory serialNumber
     ) public onlyManufacturer returns (uint256) {
-        Product memory newProduct = Product(brand, model, serialNumber, "");
+        Product memory newProduct = Product(brand, serialNumber, "");
         uint256 tokenId = uint256(
-            keccak256(abi.encode(brand, model, serialNumber))
+            keccak256(abi.encode(brand, serialNumber))
         );
-        protducts[tokenId] = newProduct;
+        products[tokenId] = newProduct;
         _safeMint(msg.sender, tokenId);
         appendLog(tokenId, "Heute", brand, "Hersteller hat Produkt erstellt.");
         return tokenId;
@@ -73,7 +74,7 @@ contract ProductNFT is ERC721, ERC721Burnable, Ownable {
         view
         returns (Product memory)
     {
-        require(_exists(tokenId), "Token does not exist");
+        require(_ownerOf(tokenId) != address(0), "Token does not exist");
         return products[tokenId];
     }
 
@@ -81,20 +82,20 @@ contract ProductNFT is ERC721, ERC721Burnable, Ownable {
         public
         onlyTransfer
     {
-        require(_exists(tokenId), "NFT does not exist");
+        require(_ownerOf(tokenId) != address(0), "NFT does not exist");
         Product storage product = products[tokenId];
 
-        bytes memory jsonData = bytes(product.serviceLogs);
+        bytes memory jsonData = bytes(product.transferLogs);
 
-        product.serviceLogs = string(abi.encodePacked(jsonData, "//"));
+        product.transferLogs = string(abi.encodePacked(jsonData, "//"));
 
-        product.serviceLogs = string(
-            abi.encodePacked(product.serviceLogs, '{"Datum" : "', date, '", "Lieferant" : "', name, '", "Beschreibung" : "', logEntry, '"}')
+        product.transferLogs = string(
+            abi.encodePacked(product.transferLogs, '{"Datum" : "', date, '", "Lieferant" : "', name, '", "Beschreibung" : "', logEntry, '"}')
         );
     }
 
-    // Override the safeTransferFrom function
-    function safeTransferFrom(
+    // Override the TransferFrom function
+    function transferFrom(
         address from,
         address to,
         uint256 tokenId
@@ -108,7 +109,7 @@ contract ProductNFT is ERC721, ERC721Burnable, Ownable {
         view
         returns (string memory)
     {
-        require(_exists(tokenId), "NFT does not exist");
-        return products[tokenId].serviceLogs;
+        require(_ownerOf(tokenId) != address(0), "NFT does not exist");
+        return products[tokenId].transferLogs;
     }
 }
