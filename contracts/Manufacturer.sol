@@ -11,9 +11,9 @@ contract Manufacturer is IERC20, Ownable {
     mapping(address => uint256) private _balances;
     mapping(address => mapping(address => uint256)) private _allowances;
 
-    constructor(uint256 initialSupply, address initialOwner)
+    constructor()
         Ownable(msg.sender) {
-        _totalSupply = initialSupply;
+        _totalSupply = 1000;
         _balances[msg.sender] = 1;
     }
 

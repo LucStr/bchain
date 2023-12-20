@@ -1,14 +1,16 @@
-const hre = require("hardhat");
-const { string, int } = require("hardhat/internal/core/params/argumentTypes");
+const {ethers} = require("hardhat");
 
 async function main() {
-    const [deployer] = await hre.ethers.getSigners();
+    const [deployer] = await ethers.getSigners();
   
     console.log("Deploying contracts with the account:", deployer.address);
     
-    const manuToken = await hre.ethers.getContractFactory("Manufacturer");
-    const manuContract = await manuToken.deploy(100, deployer.address);
-    console.log("Manu Contract address:", manuContract.address);
+    const Manufacturer = await ethers.getContractFactory("Manufacturer");
+    const contract = await Manufacturer.deploy({ gasLimit: 6000000 });
+    await contract.deployed();
+
+    //const token = await hre.ethers.deployContract("Manufacturer", 2, deployer.address);
+    console.log("Contract address:", contract.address);
 
     var debugText = await manuContract.mintToken(deployer.address, 20);
     console.log(debugText);
