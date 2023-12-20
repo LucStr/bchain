@@ -3,6 +3,7 @@ pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
 
 contract Manufacturer is IERC20, Ownable {
     uint256 private _totalSupply;
@@ -10,10 +11,10 @@ contract Manufacturer is IERC20, Ownable {
     mapping(address => uint256) private _balances;
     mapping(address => mapping(address => uint256)) private _allowances;
 
-    constructor(uint256 initialSupply)
+    constructor(uint256 initialSupply, address initialOwner)
         Ownable(msg.sender) {
         _totalSupply = initialSupply;
-        _balances[msg.sender] = initialSupply;
+        _balances[msg.sender] = 1;
     }
 
     function totalSupply() external view override returns (uint256) {
@@ -54,12 +55,12 @@ contract Manufacturer is IERC20, Ownable {
         revert("Transfers are not allowed for this token.");
     }
 
-    function mintToken(address account, uint256 amount) external onlyOwner {
+    function mintToken(address account, uint256 amount) external onlyOwner{
         require(account != address(0), "Invalid address");
         require(amount > 0, "Amount must be greater than 0");
         require(_totalSupply + amount >= _totalSupply, "Overflow");
 
-        _totalSupply += amount;
+        _totalSupply = _totalSupply + amount;
         _balances[account] += amount;
         emit Transfer(address(0), account, amount);
     }
