@@ -3,12 +3,13 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
-contract ProductNFT is ERC721, ERC721Burnable, Ownable {
+contract ProductNFT is ERC721, ERC721Burnable, ERC721Enumerable, Ownable {
     struct Product {
         string brand;
         string serialNumber;
@@ -103,7 +104,7 @@ contract ProductNFT is ERC721, ERC721Burnable, Ownable {
         address from,
         address to,
         uint256 tokenId
-    ) public override {
+    ) public override(ERC721, IERC721) {
         //appendLog(tokenId, "Heute", "Transfer", "Von 0x069086eE75c01D9A77138ED9F98D6F39Ac0233f1 nach 0x5B38Da6a701c568545dCfcB03FcB875f56beddC4 transferiert.");
         super.transferFrom(from, to, tokenId);
     }
@@ -115,5 +116,21 @@ contract ProductNFT is ERC721, ERC721Burnable, Ownable {
     {
         require(_ownerOf(tokenId) != address(0), "NFT does not exist");
         return products[tokenId].transferLogs;
+    }
+
+    function supportsInterface(bytes4 interfaceId) public view override(ERC721, ERC721Enumerable) returns (bool) {
+      return super.supportsInterface(interfaceId);
+    }
+    
+    function _update(
+      address to,
+      uint256 tokenId,
+      address auth
+    ) internal override(ERC721, ERC721Enumerable) returns (address) {
+      return super._update(to, tokenId, auth);
+    }
+
+    function _increaseBalance(address account, uint128 value) internal override(ERC721, ERC721Enumerable) {
+      super._increaseBalance(account, value);
     }
 }
