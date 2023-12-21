@@ -12,17 +12,17 @@ async function main() {
     //const token = await hre.ethers.deployContract("Manufacturer", 2, deployer.address);
     console.log("Contract address:", contract.address);
 
-    var debugText = await manuContract.mintToken(deployer.address, 20);
+    var debugText = await contract.mintToken(deployer.address, 20);
     console.log(debugText);
 
     await new Promise(resolve => setTimeout(resolve, 20000));
 
-    var balance = await manuContract.balanceOf(deployer.address);
-    var total = await manuContract.totalSupply();
+    var balance = await contract.balanceOf(deployer.address);
+    var total = await contract.totalSupply();
     console.log("Balance: " + balance.toNumber() + "| Total Tokens: " + total.toNumber());
 
     const productToken = await hre.ethers.getContractFactory("ProductNFT");
-    const productContract = await productToken.deploy(manuContract.address, deployer.address);
+    const productContract = await productToken.deploy(contract.address);
     console.log("Product Contract address:", productContract.address);
   }
   

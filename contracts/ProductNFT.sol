@@ -49,7 +49,7 @@ contract ProductNFT is ERC721, ERC721Burnable, Ownable {
         _;
     }
 
-    constructor(address _tokenContractAddress, address initialOwner) 
+    constructor(address _tokenContractAddress) 
         ERC721("Product", "WTK")
         Ownable(msg.sender) {
         tokenContract = IERC20(_tokenContractAddress);
