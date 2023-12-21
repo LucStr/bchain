@@ -14,6 +14,8 @@ contract ProductNFT is ERC721, ERC721Burnable, Ownable {
         string serialNumber;
         string transferLogs;
     }
+
+    event tokenMinted(address owner, uint256 tokenId);
 /**
     struct Transfer {
         address station;
@@ -66,6 +68,8 @@ contract ProductNFT is ERC721, ERC721Burnable, Ownable {
         products[tokenId] = newProduct;
         _safeMint(msg.sender, tokenId);
         appendLog(tokenId, "Heute", brand, "Hersteller hat Produkt erstellt.");
+        
+        emit tokenMinted(msg.sender, tokenId);
         return tokenId;
     }
 
