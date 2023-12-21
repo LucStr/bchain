@@ -104,8 +104,8 @@ contract ProductNFT is ERC721, ERC721Burnable, Ownable {
         address to,
         uint256 tokenId
     ) public override {
-        appendLog(tokenId, "Heute", "Transfer", "Von 0x069086eE75c01D9A77138ED9F98D6F39Ac0233f1 nach 0x5B38Da6a701c568545dCfcB03FcB875f56beddC4 transferiert.");
-        super.safeTransferFrom(from, to, tokenId);
+        //appendLog(tokenId, "Heute", "Transfer", "Von 0x069086eE75c01D9A77138ED9F98D6F39Ac0233f1 nach 0x5B38Da6a701c568545dCfcB03FcB875f56beddC4 transferiert.");
+        super.transferFrom(from, to, tokenId);
     }
 
     function getLogs(uint256 tokenId)

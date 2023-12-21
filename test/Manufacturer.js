@@ -8,6 +8,7 @@ describe("DApp Tests", function () {
   var _prodContract;
   var _deployer;
   var _otherAcc;
+  var _prodToken;
 
   it("A new Manufacturer Token should be created", async function (){
     [_deployer, _otherAcc] = await ethers.getSigners();
@@ -51,9 +52,17 @@ describe("DApp Tests", function () {
       const [tokenMinted] = txReceipt.events;
       const { tokenId } = tokenMinted.args;
       console.log(tokenId);
-      //expect(tokenId).to.equal(newMintItem.id);
+      
+      _prodToken = tokenId;
 
     expect(_prodContract.getProductDetails(tokenId).brand == "HP");
+  });
+
+  it("Transfer Token", async function (){
+    console.log(_prodToken);
+    await _prodContract.transferFrom(_deployer.address, _otherAcc.address, _prodToken);
+
+    expect(1==1);
   });
 
 });
