@@ -1,7 +1,7 @@
 import React from "react";
 
 // We'll use ethers to interact with the Ethereum network and our contract
-import { ethers } from "ethers";
+import { BigNumber, ethers } from "ethers";
 
 // We import the contract's artifacts and address here, as we are going to be
 // using them with ethers
@@ -55,6 +55,7 @@ export class ProductDapp extends React.Component {
       networkError: undefined,
       tokenIds: [],
       tokens: [],
+      tokenAmount: undefined
     };
 
     this.state = this.initialState;
@@ -157,12 +158,17 @@ export class ProductDapp extends React.Component {
                   }
                   tokenSymbol={this.state.tokenData.symbol}
                 />
+                <h1>You own a total of {this.state.tokenAmount.toString()}</h1>
                 <ShowProducts tokens={this.state.tokenIds} getProductDetails={async (token) => {
                   const result = await this._productNft.getProductDetails(token);
                     return {
                       brand: result[0],
                       serialNumber: result[1]
                     }
+                  }}
+                  transfer={(tokenId, to) => {
+                    console.log(this.state.selectedAddress)
+                    this._productNft.transferFrom(this.state.selectedAddress, to, tokenId);
                   }}>
 
                 </ShowProducts>
@@ -286,7 +292,15 @@ export class ProductDapp extends React.Component {
 
   async _updateBalance() {
     const balance = await this._manufacturer.balanceOf(this.state.selectedAddress);
-    this.setState({ balance });
+    const tokenAmount = await this._productNft.balanceOf(this.state.selectedAddress);
+    const tokenIds = [];
+    for (let i = 0; i < tokenAmount; i++) {
+      const tokenId = await this._productNft.tokenOfOwnerByIndex(this.state.selectedAddress, i);
+      tokenIds.push(tokenId);
+    }
+
+    console.log({tokenAmount, tokenIds})
+    this.setState({ balance, tokenAmount, tokenIds });
   }
 
   // This method sends an ethereum transaction to transfer tokens.
