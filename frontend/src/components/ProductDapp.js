@@ -19,6 +19,7 @@ import { CreateProduct } from "./CreateProduct";
 import { TransactionErrorMessage } from "./TransactionErrorMessage";
 import { WaitingForTransactionMessage } from "./WaitingForTransactionMessage";
 import { NotManufacturer } from "./NotManufacturer";
+import { ShowProducts } from "./ShowProducts";
 
 // This is the default id used by the Hardhat Network
 const HARDHAT_NETWORK_ID = '31337';
@@ -52,6 +53,8 @@ export class ProductDapp extends React.Component {
       txBeingSent: undefined,
       transactionError: undefined,
       networkError: undefined,
+      tokenIds: [],
+      tokens: [],
     };
 
     this.state = this.initialState;
@@ -147,12 +150,23 @@ export class ProductDapp extends React.Component {
               callback.
             */}
             {this.state.balance.gt(0) && (
-              <CreateProduct
-                mintProduct={(brand, serial) =>
-                  this._mintProduct(brand, serial)
-                }
-                tokenSymbol={this.state.tokenData.symbol}
-              />
+              <>
+                <CreateProduct
+                  mintProduct={(brand, serial) =>
+                    this._mintProduct(brand, serial)
+                  }
+                  tokenSymbol={this.state.tokenData.symbol}
+                />
+                <ShowProducts tokens={this.state.tokenIds} getProductDetails={async (token) => {
+                  const result = await this._productNft.getProductDetails(token);
+                    return {
+                      brand: result[0],
+                      serialNumber: result[1]
+                    }
+                  }}>
+
+                </ShowProducts>
+              </>
             )}
           </div>
         </div>
@@ -241,10 +255,21 @@ export class ProductDapp extends React.Component {
   // don't need to poll it. If that's the case, you can just fetch it when you
   // initialize the app, as we do with the token data.
   _startPollingData() {
-    this._pollDataInterval = setInterval(() => this._updateBalance(), 1000);
+    this._pollDataInterval = setInterval(() => {
+      this._updateBalance();
+      //this._updateTokens();
+    } , 1000);
 
     // We run it once immediately so we don't have to wait for it
     this._updateBalance();
+  }
+
+  _updateTokens(){
+    console.log('update TOkens')
+    this.state.tokens = Promise.all(this.state.tokenIds.map(async token => {
+      console.log('update token ', token, await this._productNft.getProductDetails(token))
+      return await this._productNft.getProductDetails(token);
+    }))
   }
 
   _stopPollingData() {
@@ -302,6 +327,11 @@ export class ProductDapp extends React.Component {
         // was mined, so we throw this generic one.
         throw new Error("Transaction failed");
       }
+
+      const [tokenMinted] = receipt.events;
+      const { tokenId } = tokenMinted.args;
+      this.state.tokenIds.push(tokenId);
+      console.log('added ', tokenId)
 
       // If we got here, the transaction was successful, so you may want to
       // update your state. Here, we update the user's balance.
