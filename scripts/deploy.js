@@ -10,17 +10,7 @@ async function main() {
     const manufacturer = await Manufacturer.deploy({ gasLimit: 6000000 });
     await manufacturer.deployed();
 
-    //const token = await hre.ethers.deployContract("Manufacturer", 2, deployer.address);
     console.log("Contract address:", manufacturer.address);
-
-    var debugText = await manufacturer.mintToken(deployer.address, 20);
-    console.log(debugText);
-
-    await new Promise(resolve => setTimeout(resolve, 20000));
-
-    var balance = await manufacturer.balanceOf(deployer.address);
-    var total = await manufacturer.totalSupply();
-    console.log("Balance: " + balance.toNumber() + "| Total Tokens: " + total.toNumber());
 
     const ProductNFT = await ethers.getContractFactory("ProductNFT");
     const productNFT = await ProductNFT.deploy(manufacturer.address);
