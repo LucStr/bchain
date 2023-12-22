@@ -159,7 +159,9 @@ export class ProductDapp extends React.Component {
                   tokenSymbol={this.state.tokenData.symbol}
                 />
                 <h1>You own a total of {this.state.tokenAmount.toString()}</h1>
-                <ShowProducts tokens={this.state.tokenIds} getProductDetails={async (token) => {
+              </>
+            )}
+            <ShowProducts tokens={this.state.tokenIds} getProductDetails={async (token) => {
                   const result = await this._productNft.getProductDetails(token);
                     return {
                       brand: result[0],
@@ -172,8 +174,6 @@ export class ProductDapp extends React.Component {
                   }}>
 
                 </ShowProducts>
-              </>
-            )}
           </div>
         </div>
       </div>

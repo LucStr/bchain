@@ -14,7 +14,7 @@ contract Manufacturer is IERC20, Ownable {
     constructor()
         Ownable(msg.sender) {
         _totalSupply = 1000;
-        _balances[msg.sender] = 2;
+        _balances[msg.sender] = 1000;
     }
 
     function totalSupply() external view override returns (uint256) {
